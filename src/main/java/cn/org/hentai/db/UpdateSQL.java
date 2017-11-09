@@ -23,9 +23,9 @@ public class UpdateSQL extends DBSQL
     Object bean = null;
     ArrayList values;
 
-    protected UpdateSQL()
+    protected UpdateSQL(JDBCBridge jdbcBridge)
     {
-        super();
+        super(jdbcBridge);
         this.fields = new ArrayList<Field>();
         this.skipFields = new HashMap<String, String>();
         this.storeFields = new HashMap<String, String>();
@@ -167,14 +167,9 @@ public class UpdateSQL extends DBSQL
         return sql.toString().replaceAll(",\\s+where", " where");
     }
 
-    public Integer execute()
+    public long execute()
     {
-        String sql = toSQL(false);
-        System.err.println("SQL: " + sql);
-        if (this.values != null && this.values.size() > 0)
-            return this.getJdbcTemplate().update(sql, this.values.toArray());
-        else
-            return this.getJdbcTemplate().update(sql);
+        return getJdbcBridge().update(toSQL(false), this.values);
     }
 
     public String toString()

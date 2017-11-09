@@ -9,6 +9,7 @@ import org.springframework.jdbc.support.KeyHolder;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -23,9 +24,9 @@ public class InsertSQL extends DBSQL
     String primaryKey;
     private ArrayList<Field> fields;
     private Object[] values;
-    public InsertSQL()
+    public InsertSQL(JDBCBridge jdbcBridge)
     {
-        super();
+        super(jdbcBridge);
         this.fields = new ArrayList<Field>();
     }
 
@@ -49,6 +50,7 @@ public class InsertSQL extends DBSQL
             for (int i = 0; i < clsFields.length; i++)
             {
                 java.lang.reflect.Field field = clsFields[i];
+                if (Modifier.isStatic(field.getModifiers())) continue;
                 Annotation anno = field.getAnnotation(Transient.class);
                 if (anno != null) continue;
 
@@ -82,7 +84,6 @@ public class InsertSQL extends DBSQL
     public String toSQL(boolean merged)
     {
         StringBuffer sql = new StringBuffer(1024);
-        // sql.append("insert into xxx (a,b,c) values (1,2,3)");
         sql.append("insert into " + tableName + " (");
         int fieldCount = 0;
         for (int i = 0, l = fields.size(); i < l; i++)
@@ -108,28 +109,14 @@ public class InsertSQL extends DBSQL
         return sql.toString();
     }
 
-    @Override
-    public Integer execute()
+    public long execute()
     {
-        return this.getJdbcTemplate().update(toSQL(false), this.values);
+        return this.getJdbcBridge().update(toSQL(false), this.values);
     }
 
-    public Long save()
+    public Object save()
     {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        long autoIncId = 0;
-
-        jdbcTemplate.update(new PreparedStatementCreator()
-        {
-            public PreparedStatement createPreparedStatement(Connection con) throws SQLException
-            {
-                PreparedStatement ps = con.prepareStatement(toSQL(true), PreparedStatement.RETURN_GENERATED_KEYS);
-                return ps;
-            }
-        }, keyHolder);
-
-        autoIncId = keyHolder.getKey().longValue();
-        return autoIncId;
+        return getJdbcBridge().insert(toSQL(false), this.values);
     }
 
     public String toString()

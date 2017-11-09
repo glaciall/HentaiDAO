@@ -1,8 +1,6 @@
-package cn.org.hentai.quickdao.util;
+package cn.org.hentai.test;
 
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 
 /**
@@ -35,19 +33,13 @@ public final class Log
 
     public static void error(Throwable ex)
     {
-        // ex.printStackTrace();
         try
         {
-            ByteArrayOutputStream error = new ByteArrayOutputStream(1024);
-            ex.printStackTrace(new PrintStream(error));
-            String[] lines = new String(error.toByteArray(), "UTF-8").split("[\r\n]+");
-            for (int i = 0; i < lines.length; i++)
-                error(lines[i]);
+            ex.printStackTrace();
+            logWriter.write(toBytes(ex.toString(), Type.ERROR));
+            logWriter.write('\n');
         }
-        catch(Exception e)
-        {
-            error(String.valueOf(ex));
-        }
+        catch(Exception e) { }
     }
 
     public static void error(String message)

@@ -25,9 +25,9 @@ public class QuerySQL extends DBSQL
     private Clause clause;
     private ArrayList<Join> joins;
 
-    protected QuerySQL()
+    protected QuerySQL(JDBCBridge jdbcBridge)
     {
-        super();
+        super(jdbcBridge);
         this.joins = new ArrayList<Join>();
     }
 
@@ -108,19 +108,9 @@ public class QuerySQL extends DBSQL
         return toWhereClause(true);
     }
 
-    @Override
     public <E> E query(String sql, Class<?> cls)
     {
-        List<E> list = (List<E>)this.getJdbcTemplate().query(sql, new PreparedStatementSetter()
-        {
-            @Override
-            public void setValues(PreparedStatement ps) throws SQLException
-            {
-                // do nothing here...
-            }
-        }, new BeanPropertyRowMapper(cls));
-        if (list.size() == 0) return null;
-        return list.get(0);
+        return getJdbcBridge().queryOne(sql, cls);
     }
 
     public <E> E query(Class cls)
@@ -130,12 +120,12 @@ public class QuerySQL extends DBSQL
 
     public <E> List<E> queryForList(Class cls)
     {
-        return (List<E>)this.getJdbcTemplate().query(toSQL(true), (PreparedStatementSetter)null, new BeanPropertyRowMapper(cls));
+        return getJdbcBridge().query(toSQL(true), cls);
     }
 
     public Long queryForCount()
     {
-        return this.getJdbcTemplate().queryForObject(toCountSQL(), Long.class);
+        return getJdbcBridge().queryForValue(toCountSQL(), Long.class);
     }
 
     public <E> List<E> queryForPaginate(Class cls, int pageIndex, int pageSize)
@@ -152,37 +142,24 @@ public class QuerySQL extends DBSQL
             }
         }, new BeanPropertyRowMapper(cls));
         */
-        return (List<E>)this.getJdbcTemplate().query(toPageSQL(pageIndex, pageSize), (PreparedStatementSetter)null, new BeanPropertyRowMapper(cls));
+        return getJdbcBridge().query(toPageSQL(pageIndex, pageSize), cls);
     }
 
     public <E> E queryForValue(Class cls)
     {
-        E value = null;
-        try
-        {
-            value = (E) jdbcTemplate.queryForObject(toSQL(true), cls);
-        }
-        catch(EmptyResultDataAccessException e)
-        {
-            // ..
-        }
-        return value;
+        // TODO: 需要检查所查询的字段必须只能是1个
+        return getJdbcBridge().queryForValue(toSQL(true), cls);
     }
 
     public <E> List<E> queryForLimit(Class cls, int offset, int count)
     {
-        return (List<E>)this.getJdbcTemplate().query(toLimitSQL(offset, count), (PreparedStatementSetter)null, new BeanPropertyRowMapper(cls));
+        return getJdbcBridge().query(toLimitSQL(offset, count), cls);
     }
 
     public <E> List<E> queryForLimit(Class cls, int count)
     {
         return queryForLimit(cls, 0, count);
     }
-
-    // queryForList()
-    // queryForCount()
-    // queryForPaginate()
-    // queryForLimit()
 
     public String toSQL(boolean merged)
     {
@@ -202,7 +179,6 @@ public class QuerySQL extends DBSQL
             sqlJoin.append(" left join " + join.tableName + " on " + join.on);
         }
         String sql = "select " + ("".equals(fieldSet) ? "*" : fieldSet) + " from " + tableName + " " + sqlJoin + " " + (null == whereClause ? "" : " where " + whereClause) + (orderBy == null ? "" : " order by " + orderBy + " " + (isAsc ? "asc" : "desc"));
-        System.err.println("SQL: " + sql);
         return sql;
     }
 
@@ -224,7 +200,6 @@ public class QuerySQL extends DBSQL
             sqlJoin.append(" left join " + join.tableName + " on " + join.on);
         }
         String sql = "select count(*) as recordcount from " + tableName + " " + sqlJoin + " " + (null == whereClause ? "" : " where " + whereClause);
-        System.err.println("SQL: " + sql);
         return sql;
     }
 
@@ -248,7 +223,6 @@ public class QuerySQL extends DBSQL
         }
         String sql = "select " + ("".equals(fieldSet) ? "*" : fieldSet) + " from " + tableName + " " + sqlJoin + " " + (null == whereClause ? "" : " where " + whereClause) + (orderBy == null ? "" : " order by " + orderBy + " " + (isAsc ? "asc" : "desc"));
         sql = sql + " limit " + ((pageIndex - 1) * pageSize) + ", " + pageSize;
-        System.err.println("SQL: " + sql);
         return sql;
     }
 
@@ -276,7 +250,6 @@ public class QuerySQL extends DBSQL
         }
         String sql = "select " + ("".equals(fieldSet) ? "*" : fieldSet) + " from " + tableName + " " + sqlJoin + " " + (null == whereClause ? "" : " where " + whereClause) + (orderBy == null ? "" : " order by " + orderBy + " " + (isAsc ? "asc" : "desc"));
         sql = sql + " limit " + offset + ", " + count;
-        System.err.println("SQL: " + sql);
         return sql;
     }
 

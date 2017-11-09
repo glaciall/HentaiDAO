@@ -9,22 +9,16 @@ import org.springframework.web.context.WebApplicationContext;
  */
 public class DBSQL
 {
-    protected JdbcTemplate jdbcTemplate;
+    private JDBCBridge jdbcBridge;
 
-    public DBSQL()
+    public DBSQL(JDBCBridge jdbcBridge)
     {
+        this.jdbcBridge = jdbcBridge;
         WebApplicationContext wac = ContextLoader.getCurrentWebApplicationContext();
-        this.jdbcTemplate = (JdbcTemplate)wac.getBean("jdbcTemplate");
     }
 
-    protected void setJdbcTemplate(JdbcTemplate jdbcTemplate)
-    {
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
-    protected JdbcTemplate getJdbcTemplate()
-    {
-        return this.jdbcTemplate;
+    public JDBCBridge getJdbcBridge() {
+        return jdbcBridge;
     }
 
     public String toSQL()
@@ -38,23 +32,6 @@ public class DBSQL
     }
 
     public String toPreparedSQL()
-    {
-        return null;
-    }
-
-    public Integer execute()
-    {
-        return null;
-    }
-
-    /*
-    public Object execute(Class<?> cls)
-    {
-        return null;
-    }
-    */
-
-    public <E> E query(String sql, Class<?> cls)
     {
         return null;
     }

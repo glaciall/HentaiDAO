@@ -18,10 +18,15 @@ import java.util.List;
 /**
  * Created by matrixy on 2017-03-06.
  */
-public abstract class DBAccess
+// TODO: 这得改个帅气点的名称，比如HentaiDAO
+public abstract class HentaiDAO
 {
-    @Autowired
-    JdbcTemplate jdbcTemplate;
+    private static JDBCBridge jdbcBridge;
+
+    public static void registerJDBCBridge(JDBCBridge bridge)
+    {
+        jdbcBridge = bridge;
+    }
 
     // *************************************************************************
     // *************************************************************************
@@ -52,29 +57,29 @@ public abstract class DBAccess
     // 修改相关
     public UpdateSQL update()
     {
-        return new UpdateSQL().setTableName(configureTableName()).setPrimaryKey(this.primaryKey());
+        return new UpdateSQL(jdbcBridge).setTableName(configureTableName()).setPrimaryKey(this.primaryKey());
     }
 
     // 插入相关
     public final InsertSQL insertInto()
     {
-        return new InsertSQL().setTableName(configureTableName()).setPrimaryKey(this.primaryKey());
+        return new InsertSQL(jdbcBridge).setTableName(configureTableName()).setPrimaryKey(this.primaryKey());
     }
 
     public final InsertSQL insertInto(String tableName)
     {
-        return new InsertSQL().setTableName(tableName).setPrimaryKey(this.primaryKey());
+        return new InsertSQL(jdbcBridge).setTableName(tableName).setPrimaryKey(this.primaryKey());
     }
 
     // 查询相关
     protected final QuerySQL select()
     {
-        return new QuerySQL().setFields(configureFields()).from(configureTableName()).setPrimaryKey(primaryKey());
+        return new QuerySQL(jdbcBridge).setFields(configureFields()).from(configureTableName()).setPrimaryKey(primaryKey());
     }
 
     public final QuerySQL select(String... fields)
     {
-        return new QuerySQL().setFields(fields).setPrimaryKey(primaryKey()).from(configureTableName());
+        return new QuerySQL(jdbcBridge).setFields(fields).setPrimaryKey(primaryKey()).from(configureTableName());
     }
 
     public final Clause clause(String sql, Object value)
@@ -88,66 +93,39 @@ public abstract class DBAccess
     }
 
     // 条件联接器
-    public static Concatenation gtz(Object data)
+    protected static Concatenation gtz(Object data)
     {
         return new Concatenation(Concatenation.Concate.gtz, data);
     }
 
-    public static Concatenation notnull(Object data)
+    protected static Concatenation notnull(Object data)
     {
         return new Concatenation(Concatenation.Concate.notnull, data);
     }
 
-    public static Concatenation like(Object data)
+    protected static Concatenation like(Object data)
     {
         return new Concatenation(Concatenation.Concate.like, data);
     }
 
-    // SQL执行函数
-    private static final PreparedStatementSetter blankSetter = new PreparedStatementSetter()
+    public <E> List<E> query(String sql, Class type)
     {
-        @Override
-        public void setValues(PreparedStatement ps) throws SQLException
-        {
-            // do nothing here
-        }
-    };
-    public <E> List<E> query(String sql, Class<? extends BaseModel> cls)
-    {
-        System.err.println("SQL: " + sql);
-        return (List<E>)jdbcTemplate.query(sql, blankSetter, new BeanPropertyRowMapper(cls));
+        return jdbcBridge.query(sql, type);
     }
 
     public <E> E queryForValue(String sql, Class type)
     {
-        System.err.println("SQL: " + sql);
-        E value = null;
-        try
-        {
-            value = (E) jdbcTemplate.queryForObject(sql, type);
-        }
-        catch(EmptyResultDataAccessException e)
-        {
-            // ..
-        }
-        return value;
+        return jdbcBridge.queryForValue(sql, type);
     }
 
-    public <E> E queryOne(String sql, Class<? extends BaseModel> cls)
+    public <E> E queryOne(String sql, Class type)
     {
-        System.err.println("SQL: " + sql);
-        List<E> list = query(sql, cls);
-        if (list == null || list.size() == 0) return null;
-        else return list.get(0);
+        return jdbcBridge.queryOne(sql, type);
     }
 
-    public Integer execute(String sql, Object...values)
+    public long execute(String sql, Object...values)
     {
-        System.err.println("SQL: " + sql);
-        if (values != null && values.length > 0)
-            return jdbcTemplate.update(sql, values);
-        else
-            return jdbcTemplate.update(sql);
+        return jdbcBridge.execute(sql, values);
     }
 
     // 日期函数
