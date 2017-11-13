@@ -111,12 +111,12 @@ public class InsertSQL extends DBSQL
 
     public long execute()
     {
-        return this.getJdbcBridge().update(toSQL(false), this.values);
+        return this.getJdbcBridge().update(getJdbcBridge().provide(), toSQL(false), this.values);
     }
 
     public Object save()
     {
-        return getJdbcBridge().insert(toSQL(false), this.values);
+        return getJdbcBridge().insert(getJdbcBridge().provide(), toSQL(false), this.values);
     }
 
     public String toString()

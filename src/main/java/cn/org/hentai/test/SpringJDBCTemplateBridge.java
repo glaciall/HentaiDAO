@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,13 +19,19 @@ import java.util.List;
 /**
  * Created by matrixy on 2017/11/10.
  */
+@Component
 public class SpringJDBCTemplateBridge implements JDBCBridge
 {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
+    public JdbcTemplate provide()
+    {
+        return jdbcTemplate;
+    }
+
     @Override
-    public Object insert(String sql, Object... values)
+    public Object insert(Object jdbc, String sql, Object... values)
     {
         Log.debug("insert: " + sql);
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -44,7 +51,7 @@ public class SpringJDBCTemplateBridge implements JDBCBridge
     }
 
     @Override
-    public long execute(String sql, Object... values)
+    public long execute(Object jdbc, String sql, Object... values)
     {
         Log.debug("execute: " + sql);
         if (values != null && values.length > 0)
@@ -54,11 +61,13 @@ public class SpringJDBCTemplateBridge implements JDBCBridge
     }
 
     @Override
-    public long update(String sql, Object... values)
+    public long update(Object jdbc, String sql, Object... values)
     {
         Log.debug("update: " + sql);
-
-        return 0;
+        if (values != null && values.length > 0)
+            return jdbcTemplate.update(sql, values);
+        else
+            return jdbcTemplate.update(sql);
     }
 
     // **************************************************************
@@ -76,21 +85,21 @@ public class SpringJDBCTemplateBridge implements JDBCBridge
     };
 
     @Override
-    public <T> T queryOne(String sql, Class type)
+    public <T> T queryOne(Object jdbc, String sql, Class type)
     {
-        List<T> list = query(sql, type);
+        List<T> list = query(jdbc, sql, type);
         if (list.size() > 0) return list.get(0);
         else return null;
     }
 
     @Override
-    public <E> List<E> query(String sql, Class type, Object... values)
+    public <E> List<E> query(Object jdbc, String sql, Class type, Object... values)
     {
         return (List<E>)jdbcTemplate.query(sql, blankSetter, new BeanPropertyRowMapper(type));
     }
 
     @Override
-    public <T> T queryForValue(String sql, Class type, Object... values)
+    public <T> T queryForValue(Object jdbc, String sql, Class type, Object... values)
     {
         T value = null;
         try

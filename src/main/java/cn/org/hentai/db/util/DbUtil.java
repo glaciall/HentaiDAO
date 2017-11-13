@@ -1,8 +1,10 @@
 package cn.org.hentai.db.util;
 
 import cn.org.hentai.db.model.Page;
+/*
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+*/
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -18,6 +20,7 @@ public final class DbUtil
 
     // static OrderService orderService;
 
+    /*
     private static Gson gson = new GsonBuilder()
             .registerTypeAdapter(
                     new TypeToken<TreeMap<String, Object>>(){}.getType(),
@@ -109,6 +112,7 @@ public final class DbUtil
             throw new RuntimeException(e);
         }
     }
+    */
 
     public static String charQuote(String val)
     {

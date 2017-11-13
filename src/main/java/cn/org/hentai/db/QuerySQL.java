@@ -110,7 +110,7 @@ public class QuerySQL extends DBSQL
 
     public <E> E query(String sql, Class<?> cls)
     {
-        return getJdbcBridge().queryOne(sql, cls);
+        return getJdbcBridge().queryOne(getJdbcBridge().provide(), sql, cls);
     }
 
     public <E> E query(Class cls)
@@ -120,12 +120,12 @@ public class QuerySQL extends DBSQL
 
     public <E> List<E> queryForList(Class cls)
     {
-        return getJdbcBridge().query(toSQL(true), cls);
+        return getJdbcBridge().query(getJdbcBridge().provide(), toSQL(true), cls);
     }
 
     public Long queryForCount()
     {
-        return getJdbcBridge().queryForValue(toCountSQL(), Long.class);
+        return getJdbcBridge().queryForValue(getJdbcBridge().provide(), toCountSQL(), Long.class);
     }
 
     public <E> List<E> queryForPaginate(Class cls, int pageIndex, int pageSize)
@@ -142,18 +142,18 @@ public class QuerySQL extends DBSQL
             }
         }, new BeanPropertyRowMapper(cls));
         */
-        return getJdbcBridge().query(toPageSQL(pageIndex, pageSize), cls);
+        return getJdbcBridge().query(getJdbcBridge().provide(), toPageSQL(pageIndex, pageSize), cls);
     }
 
     public <E> E queryForValue(Class cls)
     {
         // TODO: 需要检查所查询的字段必须只能是1个
-        return getJdbcBridge().queryForValue(toSQL(true), cls);
+        return getJdbcBridge().queryForValue(getJdbcBridge().provide(), toSQL(true), cls);
     }
 
     public <E> List<E> queryForLimit(Class cls, int offset, int count)
     {
-        return getJdbcBridge().query(toLimitSQL(offset, count), cls);
+        return getJdbcBridge().query(getJdbcBridge().provide(), toLimitSQL(offset, count), cls);
     }
 
     public <E> List<E> queryForLimit(Class cls, int count)

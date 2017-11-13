@@ -31,9 +31,9 @@ public abstract class HentaiDAO
     // *************************************************************************
     // *************************************************************************
     // 类配置
-    public abstract String[] configureFields();
+    protected abstract String[] configureFields();
 
-    public abstract String configureTableName();
+    protected abstract String configureTableName();
 
     public String primaryKey()
     {
@@ -55,18 +55,18 @@ public abstract class HentaiDAO
     }
 
     // 修改相关
-    public UpdateSQL update()
+    protected UpdateSQL update()
     {
         return new UpdateSQL(jdbcBridge).setTableName(configureTableName()).setPrimaryKey(this.primaryKey());
     }
 
     // 插入相关
-    public final InsertSQL insertInto()
+    protected final InsertSQL insertInto()
     {
         return new InsertSQL(jdbcBridge).setTableName(configureTableName()).setPrimaryKey(this.primaryKey());
     }
 
-    public final InsertSQL insertInto(String tableName)
+    protected final InsertSQL insertInto(String tableName)
     {
         return new InsertSQL(jdbcBridge).setTableName(tableName).setPrimaryKey(this.primaryKey());
     }
@@ -77,17 +77,17 @@ public abstract class HentaiDAO
         return new QuerySQL(jdbcBridge).setFields(configureFields()).from(configureTableName()).setPrimaryKey(primaryKey());
     }
 
-    public final QuerySQL select(String... fields)
+    protected final QuerySQL select(String... fields)
     {
         return new QuerySQL(jdbcBridge).setFields(fields).setPrimaryKey(primaryKey()).from(configureTableName());
     }
 
-    public final Clause clause(String sql, Object value)
+    protected final Clause clause(String sql, Object value)
     {
         return new Clause().and(sql, value);
     }
 
-    public final Clause clause(String sql)
+    protected final Clause clause(String sql)
     {
         return new Clause().and(sql, null);
     }
@@ -110,43 +110,43 @@ public abstract class HentaiDAO
 
     public <E> List<E> query(String sql, Class type)
     {
-        return jdbcBridge.query(sql, type);
+        return jdbcBridge.query(jdbcBridge.provide(), sql, type);
     }
 
     public <E> E queryForValue(String sql, Class type)
     {
-        return jdbcBridge.queryForValue(sql, type);
+        return jdbcBridge.queryForValue(jdbcBridge.provide(), sql, type);
     }
 
     public <E> E queryOne(String sql, Class type)
     {
-        return jdbcBridge.queryOne(sql, type);
+        return jdbcBridge.queryOne(jdbcBridge.provide(), sql, type);
     }
 
-    public long execute(String sql, Object...values)
+    protected long execute(String sql, Object...values)
     {
-        return jdbcBridge.execute(sql, values);
+        return jdbcBridge.execute(jdbcBridge.provide(), sql, values);
     }
 
     // 日期函数
-    public String today()
+    protected String today()
     {
         return date(0);
     }
 
-    public String tomorrow()
+    protected String tomorrow()
     {
         return date(1);
     }
 
-    public String date(int offset)
+    protected String date(int offset)
     {
         long time = System.currentTimeMillis() + (1000L * 60 * 60 * 24 * offset);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         return sdf.format(new Date(time));
     }
 
-    public String date(Date date, int offset)
+    protected String date(Date date, int offset)
     {
         if (null == date) return null;
         long time = date.getTime() + (1000L * 60 * 60 * 24 * offset);
@@ -154,7 +154,7 @@ public abstract class HentaiDAO
         return sdf.format(new Date(time));
     }
 
-    public String month(Date date, int offset)
+    protected String month(Date date, int offset)
     {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);

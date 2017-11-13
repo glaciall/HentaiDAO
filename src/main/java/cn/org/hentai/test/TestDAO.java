@@ -9,11 +9,28 @@ import java.util.List;
  */
 public class TestDAO extends HentaiDAO
 {
-    public List<TestModel> find()
+    public List<TestModel> find(int id, String name, int pageIndex, int pageSize)
     {
         return select()
-                .where(clause("id = ?", gtz(12)))
-                .queryForList(TestModel.class);
+                .where(clause("name like ?", like(name)).and("id = ?", gtz(12)))
+                .queryForPaginate(TestModel.class, pageIndex, pageSize);
+    }
+
+    public int save(TestModel model)
+    {
+        return (Integer)insertInto().valueWith(model).save();
+    }
+
+    public Long update(TestModel model)
+    {
+        return update().valueWith(model).byId().execute();
+    }
+
+    public Long findCount(int id, String name)
+    {
+        return select()
+                .where(clause("name like ?", like(name)).and("id = ?", gtz(id)))
+                .queryForCount();
     }
 
     @Override

@@ -169,7 +169,7 @@ public class UpdateSQL extends DBSQL
 
     public long execute()
     {
-        return getJdbcBridge().update(toSQL(false), this.values);
+        return getJdbcBridge().update(getJdbcBridge().provide(), toSQL(false), this.values);
     }
 
     public String toString()

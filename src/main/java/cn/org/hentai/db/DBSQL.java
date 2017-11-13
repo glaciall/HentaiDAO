@@ -1,9 +1,5 @@
 package cn.org.hentai.db;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.web.context.ContextLoader;
-import org.springframework.web.context.WebApplicationContext;
-
 /**
  * Created by matrixy on 2016/12/21.
  */
@@ -14,7 +10,6 @@ public class DBSQL
     public DBSQL(JDBCBridge jdbcBridge)
     {
         this.jdbcBridge = jdbcBridge;
-        WebApplicationContext wac = ContextLoader.getCurrentWebApplicationContext();
     }
 
     public JDBCBridge getJdbcBridge() {

@@ -7,7 +7,8 @@ import java.util.List;
  */
 public interface JDBCBridge
 {
-    // TODO: 完善注释语句
+    // 提供JDBC连接或其它可执行SQL的句柄
+    public Object provide();
 
     /**
      * 执行insert语句
@@ -15,7 +16,7 @@ public interface JDBCBridge
      * @param values
      * @return
      */
-    public Object insert(String sql, Object...values);
+    public Object insert(Object jdbc, String sql, Object...values);
 
     /**
      * 执行DML操作
@@ -23,7 +24,7 @@ public interface JDBCBridge
      * @param values
      * @return
      */
-    public long execute(String sql, Object...values);
+    public long execute(Object jdbc, String sql, Object...values);
 
     /**
      * 执行update修改
@@ -31,7 +32,7 @@ public interface JDBCBridge
      * @param values
      * @return
      */
-    public long update(String sql, Object... values);
+    public long update(Object jdbc, String sql, Object... values);
 
     /**
      * 查询一行结果
@@ -40,7 +41,7 @@ public interface JDBCBridge
      * @param <T>
      * @return
      */
-    public <T> T queryOne(String sql, Class type);
+    public <T> T queryOne(Object jdbc, String sql, Class type);
 
     /**
      * 查询一个列表
@@ -50,7 +51,7 @@ public interface JDBCBridge
      * @param <E>
      * @return
      */
-    public <E> List<E> query(String sql, Class type, Object... values);
+    public <E> List<E> query(Object jdbc, String sql, Class type, Object... values);
 
     /**
      * 查询并返回一个值
@@ -60,5 +61,5 @@ public interface JDBCBridge
      * @param <T>
      * @return
      */
-    public <T> T queryForValue(String sql, Class type, Object... values);
+    public <T> T queryForValue(Object jdbc, String sql, Class type, Object... values);
 }

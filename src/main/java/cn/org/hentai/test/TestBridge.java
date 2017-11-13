@@ -1,5 +1,6 @@
 package cn.org.hentai.test;
 
+import cn.org.hentai.db.HentaiDAO;
 import cn.org.hentai.db.JDBCBridge;
 
 import java.util.List;
@@ -9,46 +10,53 @@ import java.util.List;
  */
 public class TestBridge implements JDBCBridge
 {
-    @Override
-    public Object insert(String sql, Object... values)
+    Object jdbc = new Object();
+
+    // 提供JDBCE运行器
+    public Object provide()
     {
-        Log.debug("insert: " + sql);
+        return jdbc;
+    }
+
+    @Override
+    public Object insert(Object jdbc, String sql, Object... values)
+    {
+        Log.debug("insert[" + Integer.toHexString(jdbc.hashCode()) + "]: " + sql);
         return 0;
     }
 
     @Override
-    public long execute(String sql, Object... values)
+    public long execute(Object jdbc, String sql, Object... values)
     {
-        Log.debug("execute: " + sql);
+        Log.debug("execute[" + Integer.toHexString(jdbc.hashCode()) + "]: " + sql);
         return 0;
     }
 
     @Override
-    public long update(String sql, Object... values)
+    public long update(Object jdbc, String sql, Object... values)
     {
-        Log.debug("update: " + sql);
+        Log.debug("update[" + Integer.toHexString(jdbc.hashCode()) + "]: " + sql);
         return 0;
     }
 
     @Override
-    public <T> T queryOne(String sql, Class type)
+    public <T> T queryOne(Object jdbc, String sql, Class type)
     {
-        Log.debug("queryOne: " + sql);
+        Log.debug("queryOne[" + Integer.toHexString(jdbc.hashCode()) + "]: " + sql);
         return null;
     }
 
     @Override
-    public <E> List<E> query(String sql, Class type, Object... values)
+    public <E> List<E> query(Object jdbc, String sql, Class type, Object... values)
     {
-        Log.debug("query: " + sql);
+        Log.debug("query[" + Integer.toHexString(jdbc.hashCode()) + "]: " + sql);
         return null;
     }
 
     @Override
-    public <T> T queryForValue(String sql, Class type, Object... values)
+    public <T> T queryForValue(Object jdbc, String sql, Class type, Object... values)
     {
-        Log.debug("queryForValue: " + sql);
+        Log.debug("queryForValue[" + Integer.toHexString(jdbc.hashCode()) + "]: " + sql);
         return null;
     }
-
 }
