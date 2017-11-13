@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.PreparedStatementSetter;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -21,12 +22,7 @@ import java.util.List;
 // TODO: 这得改个帅气点的名称，比如HentaiDAO
 public abstract class HentaiDAO
 {
-    private static JDBCBridge jdbcBridge;
-
-    public static void registerJDBCBridge(JDBCBridge bridge)
-    {
-        jdbcBridge = bridge;
-    }
+    public abstract JDBCBridge jdbcBridge();
 
     // *************************************************************************
     // *************************************************************************
@@ -57,29 +53,29 @@ public abstract class HentaiDAO
     // 修改相关
     protected UpdateSQL update()
     {
-        return new UpdateSQL(jdbcBridge).setTableName(configureTableName()).setPrimaryKey(this.primaryKey());
+        return new UpdateSQL(jdbcBridge()).setTableName(configureTableName()).setPrimaryKey(this.primaryKey());
     }
 
     // 插入相关
     protected final InsertSQL insertInto()
     {
-        return new InsertSQL(jdbcBridge).setTableName(configureTableName()).setPrimaryKey(this.primaryKey());
+        return new InsertSQL(jdbcBridge()).setTableName(configureTableName()).setPrimaryKey(this.primaryKey());
     }
 
     protected final InsertSQL insertInto(String tableName)
     {
-        return new InsertSQL(jdbcBridge).setTableName(tableName).setPrimaryKey(this.primaryKey());
+        return new InsertSQL(jdbcBridge()).setTableName(tableName).setPrimaryKey(this.primaryKey());
     }
 
     // 查询相关
     protected final QuerySQL select()
     {
-        return new QuerySQL(jdbcBridge).setFields(configureFields()).from(configureTableName()).setPrimaryKey(primaryKey());
+        return new QuerySQL(jdbcBridge()).setFields(configureFields()).from(configureTableName()).setPrimaryKey(primaryKey());
     }
 
     protected final QuerySQL select(String... fields)
     {
-        return new QuerySQL(jdbcBridge).setFields(fields).setPrimaryKey(primaryKey()).from(configureTableName());
+        return new QuerySQL(jdbcBridge()).setFields(fields).setPrimaryKey(primaryKey()).from(configureTableName());
     }
 
     protected final Clause clause(String sql, Object value)
@@ -110,22 +106,22 @@ public abstract class HentaiDAO
 
     public <E> List<E> query(String sql, Class type)
     {
-        return jdbcBridge.query(jdbcBridge.provide(), sql, type);
+        return jdbcBridge().query(jdbcBridge().provide(), sql, type);
     }
 
     public <E> E queryForValue(String sql, Class type)
     {
-        return jdbcBridge.queryForValue(jdbcBridge.provide(), sql, type);
+        return jdbcBridge().queryForValue(jdbcBridge().provide(), sql, type);
     }
 
     public <E> E queryOne(String sql, Class type)
     {
-        return jdbcBridge.queryOne(jdbcBridge.provide(), sql, type);
+        return jdbcBridge().queryOne(jdbcBridge().provide(), sql, type);
     }
 
     protected long execute(String sql, Object...values)
     {
-        return jdbcBridge.execute(jdbcBridge.provide(), sql, values);
+        return jdbcBridge().execute(jdbcBridge().provide(), sql, Arrays.asList(values));
     }
 
     // 日期函数

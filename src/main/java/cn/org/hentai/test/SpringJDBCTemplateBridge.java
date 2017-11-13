@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -30,8 +31,13 @@ public class SpringJDBCTemplateBridge implements JDBCBridge
         return jdbcTemplate;
     }
 
+    public void release(Object jdbcInstance)
+    {
+        // do nothing here
+    }
+
     @Override
-    public Object insert(Object jdbc, String sql, Object... values)
+    public long insert(Object jdbc, String sql, Object... values)
     {
         Log.debug("insert: " + sql);
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -51,21 +57,21 @@ public class SpringJDBCTemplateBridge implements JDBCBridge
     }
 
     @Override
-    public long execute(Object jdbc, String sql, Object... values)
+    public long execute(Object jdbc, String sql, List values)
     {
         Log.debug("execute: " + sql);
-        if (values != null && values.length > 0)
-            return jdbcTemplate.update(sql, values);
+        if (values != null && values.size() > 0)
+            return jdbcTemplate.update(sql, values.toArray());
         else
             return jdbcTemplate.update(sql);
     }
 
     @Override
-    public long update(Object jdbc, String sql, Object... values)
+    public long update(Object jdbc, String sql, List values)
     {
         Log.debug("update: " + sql);
-        if (values != null && values.length > 0)
-            return jdbcTemplate.update(sql, values);
+        if (values != null && values.size() > 0)
+            return jdbcTemplate.update(sql, values.toArray());
         else
             return jdbcTemplate.update(sql);
     }

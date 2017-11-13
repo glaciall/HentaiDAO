@@ -1,14 +1,27 @@
 package cn.org.hentai.test;
 
 import cn.org.hentai.db.HentaiDAO;
+import cn.org.hentai.db.JDBCBridge;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
  * Created by matrixy on 2017/11/10.
  */
+@Repository
 public class TestDAO extends HentaiDAO
 {
+    @Autowired
+    SpringJDBCTemplateBridge testBridge;
+
+    public JDBCBridge jdbcBridge()
+    {
+        return testBridge;
+    }
+
     public List<TestModel> find(int id, String name, int pageIndex, int pageSize)
     {
         return select()
@@ -16,9 +29,9 @@ public class TestDAO extends HentaiDAO
                 .queryForPaginate(TestModel.class, pageIndex, pageSize);
     }
 
-    public int save(TestModel model)
+    public long save(TestModel model)
     {
-        return (Integer)insertInto().valueWith(model).save();
+        return insertInto().valueWith(model).save();
     }
 
     public Long update(TestModel model)

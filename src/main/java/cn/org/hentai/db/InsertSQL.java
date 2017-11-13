@@ -14,6 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by matrixy on 2017-03-06.
@@ -111,12 +112,12 @@ public class InsertSQL extends DBSQL
 
     public long execute()
     {
-        return this.getJdbcBridge().update(getJdbcBridge().provide(), toSQL(false), this.values);
+        return this.getJdbcBridge().update(getJdbcBridge().provide(), toSQL(false), Arrays.asList(this.values));
     }
 
-    public Object save()
+    public long save()
     {
-        return getJdbcBridge().insert(getJdbcBridge().provide(), toSQL(false), this.values);
+        return getJdbcBridge().insert(getJdbcBridge().provide(), toSQL(true));
     }
 
     public String toString()

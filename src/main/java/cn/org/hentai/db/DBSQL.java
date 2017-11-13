@@ -1,5 +1,7 @@
 package cn.org.hentai.db;
 
+import cn.org.hentai.test.Log;
+
 /**
  * Created by matrixy on 2016/12/21.
  */
@@ -12,7 +14,8 @@ public class DBSQL
         this.jdbcBridge = jdbcBridge;
     }
 
-    public JDBCBridge getJdbcBridge() {
+    public JDBCBridge getJdbcBridge()
+    {
         return jdbcBridge;
     }
 

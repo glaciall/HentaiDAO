@@ -10,13 +10,15 @@ public interface JDBCBridge
     // 提供JDBC连接或其它可执行SQL的句柄
     public Object provide();
 
+    public void release(Object jdbcInstance);
+
     /**
      * 执行insert语句
      * @param sql
      * @param values
      * @return
      */
-    public Object insert(Object jdbc, String sql, Object...values);
+    public long insert(Object jdbc, String sql, Object...values);
 
     /**
      * 执行DML操作
@@ -24,7 +26,7 @@ public interface JDBCBridge
      * @param values
      * @return
      */
-    public long execute(Object jdbc, String sql, Object...values);
+    public long execute(Object jdbc, String sql, List values);
 
     /**
      * 执行update修改
@@ -32,7 +34,7 @@ public interface JDBCBridge
      * @param values
      * @return
      */
-    public long update(Object jdbc, String sql, Object... values);
+    public long update(Object jdbc, String sql, List values);
 
     /**
      * 查询一行结果
