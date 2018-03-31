@@ -7,8 +7,6 @@ import java.util.List;
  */
 public interface JDBCBridge
 {
-    // TODO: 完善注释语句
-
     /**
      * 执行insert语句
      * @param sql
