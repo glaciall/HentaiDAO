@@ -92,60 +92,60 @@ public abstract class HentaiDAO
     }
 
     // 条件联接器
-    protected static Concatenation gtz(Object data)
+    protected static final Concatenation gtz(Object data)
     {
         return new Concatenation(Concatenation.Concate.gtz, data);
     }
 
-    protected static Concatenation notnull(Object data)
+    protected static final Concatenation notnull(Object data)
     {
         return new Concatenation(Concatenation.Concate.notnull, data);
     }
 
-    protected static Concatenation like(Object data)
+    protected static final Concatenation like(Object data)
     {
         return new Concatenation(Concatenation.Concate.like, data);
     }
 
-    public <E> List<E> query(String sql, Class type)
+    public final <E> List<E> query(String sql, Class type)
     {
         return jdbcBridge.query(sql, type);
     }
 
-    public <E> E queryForValue(String sql, Class type)
+    public final <E> E queryForValue(String sql, Class type)
     {
         return jdbcBridge.queryForValue(sql, type);
     }
 
-    public <E> E queryOne(String sql, Class type)
+    public final <E> E queryOne(String sql, Class type)
     {
         return jdbcBridge.queryOne(sql, type);
     }
 
-    public long execute(String sql, Object...values)
+    public final long execute(String sql, Object...values)
     {
         return jdbcBridge.execute(sql, values);
     }
 
     // 日期函数
-    public String today()
+    public final String today()
     {
         return date(0);
     }
 
-    public String tomorrow()
+    public final String tomorrow()
     {
         return date(1);
     }
 
-    public String date(int offset)
+    public final String date(int offset)
     {
         long time = System.currentTimeMillis() + (1000L * 60 * 60 * 24 * offset);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         return sdf.format(new Date(time));
     }
 
-    public String date(Date date, int offset)
+    public final String date(Date date, int offset)
     {
         if (null == date) return null;
         long time = date.getTime() + (1000L * 60 * 60 * 24 * offset);
