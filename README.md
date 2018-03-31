@@ -42,7 +42,7 @@ public class Test
 ```java
 public class User
 {
-	private Long id;
+    private Long id;
     private String name;
     private Long typeId;
     private java.util.Date createTime;
@@ -69,22 +69,22 @@ user.setCreateTime(new java.util.Date());
 ```java
 public class UserDAO extends HentaiDAO
 {
-	// 指明CRUD操作的默认表名
-	public String configureTableName()
+    // 指明CRUD操作的默认表名
+    public String configureTableName()
     {
-    	return "users";
+        return "users";
     }
     
     // 设置查询时所用到的字段名，不需要转换为驼峰式，按原形式写就行了
     public String[] configureFields()
     {
-    	return new String[] { "id", "name", "type_id", "is_delete", "create_time", "balance" };
+        return new String[] { "id", "name", "type_id", "is_delete", "create_time", "balance" };
     }
     
     // 指明表的主键字段名，默认为`id`，可不覆盖实现
     public String primaryKey()
     {
-    	return "id";
+        return "id";
     }
 }
 ```
@@ -144,6 +144,7 @@ public class TestBridge implements JDBCBridge
 ## 字段名转换映射
 1. 名称转换，数据库里的字段名一段以下线线_联接，在与Java实体类属性对应时，会自动转为驼峰式，比如`user_id`将转换为`userId`的形式。
 2. 类型映射，Java实体类的属性类型必须为装箱后的对象类型，对照关系如下：
+
 | 数据库类型 | Java类型 | 备注 |
 |---|---|---|
 | bigint | Long | -- |
@@ -171,12 +172,12 @@ values ('matrixy', 12, '2018-03-31 18:41:00', 1, 3.14)
 ```SQL
 update users
 set name = "matrixy",
-	type_id = 12,
+    type_id = 12,
     create_time = '2018-03-31 18:41:00',
     is_delete = 1,
     balance = 3.14,
 where
-	sex = '男'
+    sex = '男'
     and age = 20;
 ```
 
@@ -184,7 +185,7 @@ where
 ```SQL
 update users
 set name = "matrixy",
-	type_id = 12,
+    type_id = 12,
     create_time = '2018-03-31 18:41:00',
     is_delete = 1,
     balance = 3.14,
@@ -199,7 +200,7 @@ where id = 112233;
 * 另外，`only`、`skip`、`valueWith`等方法，都返回了本`UpdateSQL`实例，也就是说可以一直连续的接下去，比如：
 ```java
 update("users")
-	.valueWith("name", "test")
+    .valueWith("name", "test")
     .valueWith("is_delete", 1)
     .valueWith("create_time", new java.util.Date())
     .by(clause("id = ?", 1))
@@ -209,8 +210,8 @@ update("users")
 ## SELECT 查询
 查询的完整形式如下：
 ```
-	select(String...fields)
-    	.from(String tableName)
+    select(String...fields)
+        .from(String tableName)
         .where()
         .orderBy()
         .queryForXXX()
@@ -236,10 +237,10 @@ update("users")
 举例有如下查询，现在只关心clause方法：
 ```java
 select("id")
-	.from("test")
-	.where(
-		clause("id = ?", 1)
-	).query(xxx)
+    .from("test")
+    .where(
+        clause("id = ?", 1)
+    ).query(xxx)
 ```
 生成的SQL如下：
 ```SQL
