@@ -6,11 +6,14 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="HentaiDAO" />
+        <module name="QuickDAO" />
+        <module name="spring-test" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
+    <bytecodeTargetLevel target="1.8">
       <module name="HentaiDAO" target="1.8" />
+      <module name="QuickDAO" target="1.8" />
+      <module name="spring-test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
