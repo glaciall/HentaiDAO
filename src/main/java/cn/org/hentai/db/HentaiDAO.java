@@ -18,7 +18,6 @@ import java.util.List;
 /**
  * Created by matrixy on 2017-03-06.
  */
-// TODO: 这得改个帅气点的名称，比如HentaiDAO
 public abstract class HentaiDAO
 {
     private static JDBCBridge jdbcBridge;
