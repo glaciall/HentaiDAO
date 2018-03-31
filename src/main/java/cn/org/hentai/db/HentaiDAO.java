@@ -39,7 +39,7 @@ public abstract class HentaiDAO
         return "id";
     }
 
-    public String[] alias(String prefix, String... extras)
+    public final String[] alias(String prefix, String... extras)
     {
         String[] fields = configureFields();
         String[] aliasedFields = new String[fields.length + extras.length];
@@ -54,7 +54,7 @@ public abstract class HentaiDAO
     }
 
     // 修改相关
-    public UpdateSQL update()
+    public final UpdateSQL update()
     {
         return new UpdateSQL(jdbcBridge).setTableName(configureTableName()).setPrimaryKey(this.primaryKey());
     }
@@ -151,17 +151,5 @@ public abstract class HentaiDAO
         long time = date.getTime() + (1000L * 60 * 60 * 24 * offset);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         return sdf.format(new Date(time));
-    }
-
-    public String month(Date date, int offset)
-    {
-        Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH) + 1 + offset;
-        Calendar cl = Calendar.getInstance();
-        cl.set(year, month, 0);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
-
-        return sdf.format(cl.getTime());
     }
 }
