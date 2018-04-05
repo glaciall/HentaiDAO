@@ -1,7 +1,8 @@
 package cn.org.hentai.dao;
 
-import cn.org.hentai.dao.annotation.DBField;
-import cn.org.hentai.dao.annotation.Transient;
+import cn.org.hentai.dao.model.Type;
+import cn.org.hentai.dao.model.TypeField;
+import cn.org.hentai.dao.util.ClassStructures;
 import cn.org.hentai.dao.util.DbUtil;
 
 import java.lang.annotation.Annotation;
@@ -53,23 +54,14 @@ public class UpdateSQL extends DBSQL
         this.bean = bean;
         try
         {
-            java.lang.reflect.Field[] clsFields = bean.getClass().getDeclaredFields();
-            for (int i = 0; i < clsFields.length; i++)
+            Type type = ClassStructures.get(bean.getClass());
+            this.setPrimaryKey(type.getPrimaryKey());
+            this.setTableName(type.getName());
+            TypeField[] fields = type.getFields();
+            for (int i = 0; i < fields.length; i++)
             {
-                java.lang.reflect.Field field = clsFields[i];
-                if (field.getName().equals(this.primaryKey)) continue;
-                Annotation anno = field.getAnnotation(Transient.class);
-                if (anno != null) continue;
-                String methodName = DbUtil.formatFieldName("get_" + field.getName());
-                if (field.getType().isAssignableFrom(Boolean.class)) methodName = DbUtil.formatFieldName(field.getName().replaceAll("^(is)?", "get_"));
-                Method method = bean.getClass().getDeclaredMethod(methodName);
-
-                String fieldName = null;
-                DBField type = field.getAnnotation(DBField.class);
-                if (type != null) fieldName = type.name();
-                else fieldName = DbUtil.toDBName(field.getName());
-
-                this.fields.add(new Field(fieldName, method.invoke(bean)));
+                TypeField field = fields[i];
+                this.fields.add(new Field(field.getName(), field.getGetter().invoke(bean)));
             }
         }
         catch(Exception ex)
@@ -142,6 +134,7 @@ public class UpdateSQL extends DBSQL
         for (int i = 0, l = fields.size(); i < l; i++)
         {
             Field field = fields.get(i);
+            if (this.primaryKey != null && field.name.equals(this.primaryKey)) continue;
             if (this.skipFields.containsKey(field.name)) continue;
             if (this.storeFields.size() > 0 && !this.storeFields.containsKey(field.name)) continue;
             sql.append(field.name);

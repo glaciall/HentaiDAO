@@ -1,6 +1,7 @@
 package cn.org.hentai.test;
 
 import cn.org.hentai.dao.HentaiDAO;
+import cn.org.hentai.test.model.User;
 
 import java.util.List;
 
@@ -9,22 +10,21 @@ import java.util.List;
  */
 public class TestDAO extends HentaiDAO
 {
-    public List<TestModel> find()
+    public User getById(int id)
     {
         return select()
-                .where(clause("id = ?", gtz(12)))
-                .queryForList(TestModel.class);
+                .from(User.class)
+                .where(clause("id = ?", gtz(id)))
+                .query();
     }
 
-    @Override
-    public String[] configureFields()
+    public Long save(User user)
     {
-        return new String[] { "id", "name" };
+        return insertInto().valueWith(user).save();
     }
 
-    @Override
-    public String configureTableName()
+    public Long update(User user)
     {
-        return "test";
+        return update().valueWith(user).byId().execute();
     }
 }

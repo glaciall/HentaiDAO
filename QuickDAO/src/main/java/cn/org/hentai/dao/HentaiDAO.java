@@ -1,5 +1,7 @@
 package cn.org.hentai.dao;
 
+import cn.org.hentai.dao.converter.BaseFieldNameConverter;
+import cn.org.hentai.dao.converter.CamelCaseConverterBase;
 import cn.org.hentai.dao.util.DbUtil;
 
 import java.text.SimpleDateFormat;
@@ -11,65 +13,32 @@ import java.util.List;
  */
 public abstract class HentaiDAO
 {
-    private static JDBCBridge jdbcBridge;
-
-    public static void registerJDBCBridge(JDBCBridge bridge)
-    {
-        jdbcBridge = bridge;
-    }
-
-    // *************************************************************************
-    // *************************************************************************
-    // 类配置
-    public abstract String[] configureFields();
-
-    public abstract String configureTableName();
-
-    public String primaryKey()
-    {
-        return "id";
-    }
-
-    public final String[] alias(String prefix, String... extras)
-    {
-        String[] fields = configureFields();
-        String[] aliasedFields = new String[fields.length + extras.length];
-        for (int i = 0; i < fields.length; i++) aliasedFields[i] = prefix + '.' + fields[i];
-        for (int i = 0; i < extras.length; i++)
-        {
-            String field = extras[i];
-            if (field.indexOf(' ') == -1 && field.indexOf('_') > -1) field = DbUtil.formatFieldName(field);
-            aliasedFields[i + fields.length] = field;
-        }
-        return aliasedFields;
-    }
-
     // 修改相关
     public final UpdateSQL update()
     {
-        return new UpdateSQL(jdbcBridge).setTableName(configureTableName()).setPrimaryKey(this.primaryKey());
+        return new UpdateSQL(jdbcBridge);
     }
 
     // 插入相关
     public final InsertSQL insertInto()
     {
-        return new InsertSQL(jdbcBridge).setTableName(configureTableName()).setPrimaryKey(this.primaryKey());
+        return new InsertSQL(jdbcBridge);
     }
 
     public final InsertSQL insertInto(String tableName)
     {
-        return new InsertSQL(jdbcBridge).setTableName(tableName).setPrimaryKey(this.primaryKey());
+        return new InsertSQL(jdbcBridge).setTableName(tableName);
     }
 
     // 查询相关
     protected final QuerySQL select()
     {
-        return new QuerySQL(jdbcBridge).setFields(configureFields()).from(configureTableName()).setPrimaryKey(primaryKey());
+        return new QuerySQL(jdbcBridge);
     }
 
     public final QuerySQL select(String... fields)
     {
-        return new QuerySQL(jdbcBridge).setFields(fields).setPrimaryKey(primaryKey()).from(configureTableName());
+        return new QuerySQL(jdbcBridge).setFields(fields);
     }
 
     public final Clause clause(String sql, Object value)
@@ -142,5 +111,23 @@ public abstract class HentaiDAO
         long time = date.getTime() + (1000L * 60 * 60 * 24 * offset);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         return sdf.format(new Date(time));
+    }
+
+    // 静态成员，需要在应用初始化时同时设置
+    private static JDBCBridge jdbcBridge;
+    public static void setupJDBCBridge(JDBCBridge bridge)
+    {
+        jdbcBridge = bridge;
+    }
+
+    // 默认的字段名转换器
+    private static BaseFieldNameConverter customFieldNameConverter = new CamelCaseConverterBase();
+    public static void setupFieldNameConverter(BaseFieldNameConverter converter)
+    {
+        customFieldNameConverter = converter;
+    }
+    public static BaseFieldNameConverter getFieldNameConverter()
+    {
+        return customFieldNameConverter;
     }
 }

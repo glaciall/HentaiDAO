@@ -24,11 +24,11 @@ public class SpringJDBCTemplateBridge implements JDBCBridge
     JdbcTemplate jdbcTemplate;
 
     @Override
-    public Object insert(String sql, Object... values)
+    public <E> E insert(String sql, Object... values)
     {
         Log.debug("insert: " + sql);
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        long autoIncId = 0;
+        Long autoIncId = 0L;
 
         jdbcTemplate.update(new PreparedStatementCreator()
         {
@@ -40,25 +40,24 @@ public class SpringJDBCTemplateBridge implements JDBCBridge
         }, keyHolder);
 
         autoIncId = keyHolder.getKey().longValue();
-        return autoIncId;
+        return (E)autoIncId;
     }
 
     @Override
-    public long execute(String sql, Object... values)
+    public <E> E execute(String sql, Object... values)
     {
         Log.debug("execute: " + sql);
         if (values != null && values.length > 0)
-            return jdbcTemplate.update(sql, values);
+            return (E)(new Long(jdbcTemplate.update(sql, values)));
         else
-            return jdbcTemplate.update(sql);
+            return (E)(new Long(jdbcTemplate.update(sql)));
     }
 
     @Override
-    public long update(String sql, Object... values)
+    public <E> E update(String sql, Object... values)
     {
         Log.debug("update: " + sql);
-
-        return 0;
+        return (E)null;
     }
 
     // **************************************************************
@@ -76,9 +75,9 @@ public class SpringJDBCTemplateBridge implements JDBCBridge
     };
 
     @Override
-    public <T> T queryOne(String sql, Class type)
+    public <E> E queryOne(String sql, Class type)
     {
-        List<T> list = query(sql, type);
+        List<E> list = query(sql, type);
         if (list.size() > 0) return list.get(0);
         else return null;
     }
@@ -90,12 +89,12 @@ public class SpringJDBCTemplateBridge implements JDBCBridge
     }
 
     @Override
-    public <T> T queryForValue(String sql, Class type, Object... values)
+    public <E> E queryForValue(String sql, Class type, Object... values)
     {
-        T value = null;
+        E value = null;
         try
         {
-            value = (T) jdbcTemplate.queryForObject(sql, type);
+            value = (E) jdbcTemplate.queryForObject(sql, type);
         }
         catch(EmptyResultDataAccessException e)
         {

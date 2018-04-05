@@ -1,7 +1,8 @@
 package cn.org.hentai.dao;
 
-import cn.org.hentai.dao.annotation.DBField;
-import cn.org.hentai.dao.annotation.Transient;
+import cn.org.hentai.dao.model.Type;
+import cn.org.hentai.dao.model.TypeField;
+import cn.org.hentai.dao.util.ClassStructures;
 import cn.org.hentai.dao.util.DbUtil;
 
 import java.lang.annotation.Annotation;
@@ -40,25 +41,14 @@ public class InsertSQL extends DBSQL
     {
         try
         {
-            java.lang.reflect.Field[] clsFields = bean.getClass().getDeclaredFields();
-            for (int i = 0; i < clsFields.length; i++)
+            Type type = ClassStructures.get(bean.getClass());
+            this.setTableName(type.getName());
+            this.setPrimaryKey(type.getPrimaryKey());
+            TypeField[] fields = type.getFields();
+            for (int i = 0; i < fields.length; i++)
             {
-                java.lang.reflect.Field field = clsFields[i];
-                if (Modifier.isStatic(field.getModifiers())) continue;
-                Annotation anno = field.getAnnotation(Transient.class);
-                if (anno != null) continue;
-
-                String methodName = DbUtil.formatFieldName("get_" + field.getName());
-                if (field.getType().isAssignableFrom(Boolean.class)) methodName = DbUtil.formatFieldName(field.getName().replaceAll("^(is)?", "get_"));
-
-                DBField type = (DBField)field.getAnnotation(DBField.class);
-                String fieldName = null;
-                if (type != null) fieldName = type.name();
-                else fieldName = DbUtil.toDBName(field.getName());
-
-                Method method = bean.getClass().getDeclaredMethod(methodName);
-
-                this.fields.add(new Field(fieldName, method.invoke(bean)));
+                TypeField field = fields[i];
+                this.fields.add(new Field(field.getName(), field.getGetter().invoke(bean)));
             }
         }
         catch(Exception ex)
@@ -108,7 +98,7 @@ public class InsertSQL extends DBSQL
         return this.getJdbcBridge().update(toSQL(false), this.values);
     }
 
-    public Object save()
+    public <E> E save()
     {
         return getJdbcBridge().insert(toSQL(false), this.values);
     }

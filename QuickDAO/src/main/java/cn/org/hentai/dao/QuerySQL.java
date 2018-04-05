@@ -1,5 +1,8 @@
 package cn.org.hentai.dao;
 
+import cn.org.hentai.dao.model.Type;
+import cn.org.hentai.dao.model.TypeField;
+import cn.org.hentai.dao.util.ClassStructures;
 import cn.org.hentai.dao.util.DbUtil;
 
 import java.util.ArrayList;
@@ -10,8 +13,6 @@ import java.util.List;
  */
 public class QuerySQL extends DBSQL
 {
-    // TODO: in (*) 功能的实现
-
     private ArrayList<String> fields;
     private String tableName;
     private String orderBy;
@@ -19,26 +20,26 @@ public class QuerySQL extends DBSQL
     private boolean isAsc = true;
     private Clause clause;
     private ArrayList<Join> joins;
+    private Class pojoType;
 
     protected QuerySQL(JDBCBridge jdbcBridge)
     {
         super(jdbcBridge);
         this.joins = new ArrayList<Join>();
+        this.fields = new ArrayList<String>(20);
     }
 
     protected QuerySQL setFields(String... fields)
     {
         if (fields == null) return this;
-        this.fields = new ArrayList<String>();
         for (int i = 0, l = fields.length; i < l; i++)
         {
-            // if (!fields[i].matches("^(\\w+\\.)?[\\w\\*]+$")) throw new RuntimeException("invalid field name: " + fields[i]);
             this.fields.add(fields[i]);
         }
         return this;
     }
 
-    public QuerySQL setPrimaryKey(String key)
+    private QuerySQL setPrimaryKey(String key)
     {
         this.primaryKey = key;
         return this;
@@ -50,6 +51,18 @@ public class QuerySQL extends DBSQL
         return this;
     }
 
+    public QuerySQL from(Class typeClass)
+    {
+        Type type = ClassStructures.get(typeClass);
+        this.tableName = type.getName();
+        this.primaryKey = type.getPrimaryKey();
+        this.pojoType = typeClass;
+        TypeField[] typeFields = type.getFields();
+        this.fields.clear();
+        for (int i = 0; i < typeFields.length; i++) this.fields.add(typeFields[i].getName());
+        return this;
+    }
+
     public QuerySQL leftJoin(String tableName, String on)
     {
         this.joins.add(new Join(tableName, on));
@@ -58,6 +71,7 @@ public class QuerySQL extends DBSQL
 
     public QuerySQL byId(Object id)
     {
+        if (this.primaryKey == null || this.primaryKey.trim().length() == 0) throw new RuntimeException("No primary key declared");
         return where(new Clause(primaryKey + " = ?", id));
     }
 
@@ -103,19 +117,19 @@ public class QuerySQL extends DBSQL
         return toWhereClause(true);
     }
 
-    public <E> E query(String sql, Class<?> cls)
+    private <E> E query(String sql)
     {
-        return getJdbcBridge().queryOne(sql, cls);
+        return getJdbcBridge().queryOne(sql, this.pojoType);
     }
 
-    public <E> E query(Class cls)
+    public <E> E query()
     {
-        return query(toSQL(true), cls);
+        return query(toSQL(true));
     }
 
-    public <E> List<E> queryForList(Class cls)
+    public <E> List<E> queryForList()
     {
-        return getJdbcBridge().query(toSQL(true), cls);
+        return getJdbcBridge().query(toSQL(true), this.pojoType);
     }
 
     public Long queryForCount()
@@ -123,37 +137,24 @@ public class QuerySQL extends DBSQL
         return getJdbcBridge().queryForValue(toCountSQL(), Long.class);
     }
 
-    public <E> List<E> queryForPaginate(Class cls, int pageIndex, int pageSize)
+    public <E> List<E> queryForPaginate(int pageIndex, int pageSize)
     {
-        // TODO: 参数化查询改造的关键
-        /*
-        JdbcTemplate jdbcTemplate = this.getJdbcTemplate();
-        jdbcTemplate.query(toPageSQL(pageIndex, pageSize), new PreparedStatementSetter(){
-
-            @Override
-            public void setValues(PreparedStatement ps) throws SQLException
-            {
-                ps.setByte();
-            }
-        }, new BeanPropertyRowMapper(cls));
-        */
-        return getJdbcBridge().query(toPageSQL(pageIndex, pageSize), cls);
+        return getJdbcBridge().query(toPageSQL(pageIndex, pageSize), this.pojoType);
     }
 
     public <E> E queryForValue(Class cls)
     {
-        // TODO: 需要检查所查询的字段必须只能是1个
         return getJdbcBridge().queryForValue(toSQL(true), cls);
     }
 
-    public <E> List<E> queryForLimit(Class cls, int offset, int count)
+    public <E> List<E> queryForLimit(int offset, int count)
     {
-        return getJdbcBridge().query(toLimitSQL(offset, count), cls);
+        return getJdbcBridge().query(toLimitSQL(offset, count), this.pojoType);
     }
 
     public <E> List<E> queryForLimit(Class cls, int count)
     {
-        return queryForLimit(cls, 0, count);
+        return queryForLimit(0, count);
     }
 
     public String toSQL(boolean merged)

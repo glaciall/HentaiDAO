@@ -13,7 +13,7 @@ public interface JDBCBridge
      * @param values
      * @return
      */
-    public Object insert(String sql, Object... values);
+    public <E> E insert(String sql, Object... values);
 
     /**
      * 执行DML操作
@@ -21,7 +21,7 @@ public interface JDBCBridge
      * @param values
      * @return
      */
-    public long execute(String sql, Object... values);
+    public <E> E execute(String sql, Object... values);
 
     /**
      * 执行update修改
@@ -29,16 +29,16 @@ public interface JDBCBridge
      * @param values
      * @return
      */
-    public long update(String sql, Object... values);
+    public <E> E update(String sql, Object... values);
 
     /**
      * 查询一行结果
      * @param sql
      * @param type
-     * @param <T>
+     * @param <E>
      * @return
      */
-    public <T> T queryOne(String sql, Class type);
+    public <E> E queryOne(String sql, Class type);
 
     /**
      * 查询一个列表
@@ -55,8 +55,8 @@ public interface JDBCBridge
      * @param sql
      * @param type
      * @param values
-     * @param <T>
+     * @param <E>
      * @return
      */
-    public <T> T queryForValue(String sql, Class type, Object... values);
+    public <E> E queryForValue(String sql, Class type, Object... values);
 }

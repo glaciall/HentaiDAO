@@ -11,8 +11,8 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="1.8">
-      <module name="HentaiDAO" target="1.8" />
-      <module name="QuickDAO" target="1.8" />
+      <module name="HentaiDAO" target="1.5" />
+      <module name="QuickDAO" target="1.5" />
       <module name="spring-test" target="1.8" />
     </bytecodeTargetLevel>
   </component>

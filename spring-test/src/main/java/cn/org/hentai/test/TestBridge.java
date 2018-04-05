@@ -10,28 +10,28 @@ import java.util.List;
 public class TestBridge implements JDBCBridge
 {
     @Override
-    public Object insert(String sql, Object... values)
+    public Long insert(String sql, Object... values)
     {
         Log.debug("insert: " + sql);
-        return 0;
+        return 0L;
     }
 
     @Override
-    public long execute(String sql, Object... values)
+    public Long execute(String sql, Object... values)
     {
         Log.debug("execute: " + sql);
-        return 0;
+        return 0L;
     }
 
     @Override
-    public long update(String sql, Object... values)
+    public Long update(String sql, Object... values)
     {
         Log.debug("update: " + sql);
-        return 0;
+        return 0L;
     }
 
     @Override
-    public <T> T queryOne(String sql, Class type)
+    public <E> E queryOne(String sql, Class type)
     {
         Log.debug("queryOne: " + sql);
         return null;
@@ -45,7 +45,7 @@ public class TestBridge implements JDBCBridge
     }
 
     @Override
-    public <T> T queryForValue(String sql, Class type, Object... values)
+    public <E> E queryForValue(String sql, Class type, Object... values)
     {
         Log.debug("queryForValue: " + sql);
         return null;
