@@ -20,6 +20,11 @@ public final class DbUtil
         return val.replaceAll("'", "\\\\'");
     }
 
+    /**
+     * 将下划线_分隔的转为驼峰式的形式
+     * @param name
+     * @return
+     */
     public static String formatFieldName(String name)
     {
         String newName = "";
@@ -39,6 +44,11 @@ public final class DbUtil
         return newName;
     }
 
+    /**
+     * 将驼峰式转换为下划线_的形式
+     * @param name
+     * @return
+     */
     public static String toDBName(String name)
     {
         StringBuffer newName = new StringBuffer(32);
