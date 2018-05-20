@@ -19,11 +19,6 @@ public class DBSQL
 
     public String toSQL()
     {
-        return toSQL(true);
-    }
-
-    protected String toSQL(boolean merged)
-    {
         return null;
     }
 
