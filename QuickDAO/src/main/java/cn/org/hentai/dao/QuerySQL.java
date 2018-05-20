@@ -106,50 +106,34 @@ public class QuerySQL extends DBSQL
         return this;
     }
 
-    private String toWhereClause(boolean merged)
-    {
-        if (clause == null) return null;
-        return clause.toWhereClause();
-    }
-
-    private String toWhereClause()
-    {
-        return toWhereClause(true);
-    }
-
-    private <E> E query(String sql)
-    {
-        return getJdbcBridge().queryOne(sql, this.pojoType);
-    }
-
     public <E> E query()
     {
-        return query(toSQL(true));
+        return getJdbcBridge().queryOne(toSQL(), this.pojoType, clause.getValues());
     }
 
     public <E> List<E> queryForList()
     {
-        return getJdbcBridge().query(toSQL(true), this.pojoType);
+        return getJdbcBridge().query(toSQL(true), this.pojoType, clause.getValues());
     }
 
     public Long queryForCount()
     {
-        return getJdbcBridge().queryForValue(toCountSQL(), Long.class);
+        return getJdbcBridge().queryForValue(toCountSQL(), Long.class, clause.getValues());
     }
 
     public <E> List<E> queryForPaginate(int pageIndex, int pageSize)
     {
-        return getJdbcBridge().query(toPageSQL(pageIndex, pageSize), this.pojoType);
+        return getJdbcBridge().query(toPageSQL(pageIndex, pageSize), this.pojoType, clause.getValues());
     }
 
     public <E> E queryForValue(Class cls)
     {
-        return getJdbcBridge().queryForValue(toSQL(true), cls);
+        return getJdbcBridge().queryForValue(toSQL(true), cls, clause.getValues());
     }
 
     public <E> List<E> queryForLimit(int offset, int count)
     {
-        return getJdbcBridge().query(toLimitSQL(offset, count), this.pojoType);
+        return getJdbcBridge().query(toLimitSQL(offset, count), this.pojoType, clause.getValues());
     }
 
     public <E> List<E> queryForLimit(Class cls, int count)
@@ -157,69 +141,44 @@ public class QuerySQL extends DBSQL
         return queryForLimit(0, count);
     }
 
-    public String toSQL(boolean merged)
+    public String toSQL()
     {
-        String whereClause = toWhereClause(merged);
-        String fieldSet = "";
-        for (int i = 0; this.fields != null && i < this.fields.size(); i++)
+        return createSQL(false, null, null);
+    }
+
+    private String createSQL(boolean countSQL, Integer limitOffset, Integer limitCount)
+    {
+        String whereClause = this.clause.toWhereClause();
+        StringBuffer fieldSet = new StringBuffer();
+        for (int i = 0; countSQL == false && this.fields != null && i < this.fields.size(); i++)
         {
             String fieldName = this.fields.get(i);
-            fieldSet += fieldName;
-            if (fieldName.indexOf(' ') == -1 && fieldName.indexOf('_') > -1) fieldSet += " as " + DbUtil.formatFieldName(fieldName);
-            if (i < this.fields.size() - 1) fieldSet += ',';
+            fieldSet.append(fieldName);
+            if (fieldName.indexOf(' ') == -1 && fieldName.indexOf('_') > -1) fieldSet.append(" as ").append(DbUtil.formatFieldName(fieldName));
+            if (i < this.fields.size() - 1) fieldSet.append(',');
         }
         StringBuffer sqlJoin = new StringBuffer();
         for (int i = 0; i < joins.size(); i++)
         {
             Join join = joins.get(i);
-            sqlJoin.append(" left join " + join.tableName + " on " + join.on);
+            sqlJoin.append(" left join ").append(join.tableName).append(" on ").append(join.on);
         }
-        String sql = "select " + ("".equals(fieldSet) ? "*" : fieldSet) + " from " + tableName + " " + sqlJoin + " " + (null == whereClause ? "" : " where " + whereClause) + (orderBy == null ? "" : " order by " + orderBy + " " + (isAsc ? "asc" : "desc"));
-        return sql;
+        return "select "
+                + (countSQL ? "count(*) as recordcount" : fieldSet)
+                + " from " + tableName + " " + sqlJoin + " "
+                + (null == whereClause ? "" : " where " + whereClause)
+                + (orderBy == null || countSQL == true ? "" : " order by " + orderBy + " " + (isAsc ? "asc" : "desc"));
     }
 
     public String toCountSQL()
     {
-        String whereClause = toWhereClause();
-        String fieldSet = "";
-        for (int i = 0; this.fields != null && i < this.fields.size(); i++)
-        {
-            String fieldName = this.fields.get(i);
-            fieldSet += fieldName;
-            if (fieldName.indexOf(' ') == -1 && fieldName.indexOf('_') > -1) fieldSet += " as " + DbUtil.formatFieldName(fieldName);
-            if (i < this.fields.size() - 1) fieldSet += ',';
-        }
-        StringBuffer sqlJoin = new StringBuffer();
-        for (int i = 0; i < joins.size(); i++)
-        {
-            Join join = joins.get(i);
-            sqlJoin.append(" left join " + join.tableName + " on " + join.on);
-        }
-        String sql = "select count(*) as recordcount from " + tableName + " " + sqlJoin + " " + (null == whereClause ? "" : " where " + whereClause);
-        return sql;
+        return createSQL(true, null, null);
     }
 
     public String toPageSQL(int pageIndex, int pageSize)
     {
         pageIndex = Math.max(1, pageIndex);
-        String whereClause = toWhereClause();
-        String fieldSet = "";
-        for (int i = 0; this.fields != null && i < this.fields.size(); i++)
-        {
-            String fieldName = this.fields.get(i);
-            fieldSet += fieldName;
-            if (fieldName.indexOf(' ') == -1 && fieldName.indexOf('_') > -1) fieldSet += " as " + DbUtil.formatFieldName(fieldName);
-            if (i < this.fields.size() - 1) fieldSet += ',';
-        }
-        StringBuffer sqlJoin = new StringBuffer();
-        for (int i = 0; i < joins.size(); i++)
-        {
-            Join join = joins.get(i);
-            sqlJoin.append(" left join " + join.tableName + " on " + join.on);
-        }
-        String sql = "select " + ("".equals(fieldSet) ? "*" : fieldSet) + " from " + tableName + " " + sqlJoin + " " + (null == whereClause ? "" : " where " + whereClause) + (orderBy == null ? "" : " order by " + orderBy + " " + (isAsc ? "asc" : "desc"));
-        sql = sql + " limit " + ((pageIndex - 1) * pageSize) + ", " + pageSize;
-        return sql;
+        return createSQL(false, (pageIndex - 1) * pageSize, pageSize);
     }
 
     public String toLimitSQL(int count)
@@ -229,28 +188,6 @@ public class QuerySQL extends DBSQL
 
     public String toLimitSQL(int offset, int count)
     {
-        String whereClause = toWhereClause();
-        String fieldSet = "";
-        for (int i = 0; this.fields != null && i < this.fields.size(); i++)
-        {
-            String fieldName = this.fields.get(i);
-            fieldSet += fieldName;
-            if (fieldName.indexOf(' ') == -1 && fieldName.indexOf('_') > -1) fieldSet += " as " + DbUtil.formatFieldName(fieldName);
-            if (i < this.fields.size() - 1) fieldSet += ',';
-        }
-        StringBuffer sqlJoin = new StringBuffer();
-        for (int i = 0; i < joins.size(); i++)
-        {
-            Join join = joins.get(i);
-            sqlJoin.append(" left join " + join.tableName + " on " + join.on);
-        }
-        String sql = "select " + ("".equals(fieldSet) ? "*" : fieldSet) + " from " + tableName + " " + sqlJoin + " " + (null == whereClause ? "" : " where " + whereClause) + (orderBy == null ? "" : " order by " + orderBy + " " + (isAsc ? "asc" : "desc"));
-        sql = sql + " limit " + offset + ", " + count;
-        return sql;
-    }
-
-    public String toString()
-    {
-        return toSQL();
+        return createSQL(false, offset, count);
     }
 }

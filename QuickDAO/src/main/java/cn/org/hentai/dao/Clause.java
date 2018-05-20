@@ -1,6 +1,7 @@
 package cn.org.hentai.dao;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -22,7 +23,7 @@ public class Clause
     }
 
     // clause("id = ?", 0).and("name like ?", name)
-    // 需要考虑一下如何支持多级条件分组
+    // TODO: 需要考虑一下如何支持多级条件分组
     public Clause and(String sql, Object value)
     {
         conditions.add(new Block(sql, value));
@@ -34,24 +35,20 @@ public class Clause
         return and(sql, null);
     }
 
-    public ArrayList getValues()
+    public Object[] getValues()
     {
         ArrayList values = new ArrayList((int)(conditions.size() * 1.5f));
         for (int i = 0; i < conditions.size(); i++)
         {
             Block block = conditions.get(i);
+            if (block.test() == null) continue;
             if (block.data instanceof Concatenation)
             {
                 values.add(((Concatenation)block.data).data);
             }
             else values.add(block.data);
         }
-        return values;
-    }
-
-    public String toWhereClause()
-    {
-        return toWhereClause(true);
+        return values.toArray();
     }
 
     public String toWhere()
@@ -67,16 +64,8 @@ public class Clause
         return sql.length() == 0 ? null : sql.toString().replaceAll("\\s+and\\s+$", "");
     }
 
-    public String toWhereClause(boolean merged)
+    public String toWhereClause()
     {
-        StringBuffer where = new StringBuffer(512);
-        for (int i = 0, l = conditions.size(); i < l; i++)
-        {
-            String condition = conditions.get(i).format();
-            if (null == condition) continue;
-            where.append(condition);
-            if (i < l - 1) where.append(" and ");
-        }
-        return "".equals(where) ? null : where.toString().replaceAll("\\s+and\\s+$", "");
+        return toWhere();
     }
 }

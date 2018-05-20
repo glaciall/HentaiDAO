@@ -8,7 +8,9 @@ import cn.org.hentai.dao.util.DbUtil;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by matrixy on 2017-03-06.
@@ -154,7 +156,10 @@ public class UpdateSQL extends DBSQL
         {
             sql.append(" where ");
             sql.append(where);
-            if (!merged) this.values.addAll(clause.getValues());
+            if (!merged)
+            {
+                this.values.addAll(Arrays.asList(clause.getValues()));
+            }
         }
         else throw new RuntimeException("missing where clause: " + sql);
         return sql.toString().replaceAll(",\\s+where", " where");
