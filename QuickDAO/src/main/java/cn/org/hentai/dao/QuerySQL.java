@@ -58,8 +58,8 @@ public class QuerySQL extends DBSQL
         this.primaryKey = type.getPrimaryKey();
         this.pojoType = typeClass;
         TypeField[] typeFields = type.getFields();
-        this.fields.clear();
-        for (int i = 0; i < typeFields.length; i++) this.fields.add(typeFields[i].getName());
+        boolean noDesireFields = this.fields.size() == 0;
+        for (int i = 0; noDesireFields && i < typeFields.length; i++) this.fields.add(typeFields[i].getName());
         return this;
     }
 
@@ -113,7 +113,7 @@ public class QuerySQL extends DBSQL
 
     public <E> List<E> queryForList()
     {
-        return getJdbcBridge().query(toSQL(true), this.pojoType, clause.getValues());
+        return getJdbcBridge().query(toSQL(), this.pojoType, clause.getValues());
     }
 
     public Long queryForCount()
@@ -128,7 +128,7 @@ public class QuerySQL extends DBSQL
 
     public <E> E queryForValue(Class cls)
     {
-        return getJdbcBridge().queryForValue(toSQL(true), cls, clause.getValues());
+        return getJdbcBridge().queryForValue(toSQL(), cls, clause.getValues());
     }
 
     public <E> List<E> queryForLimit(int offset, int count)

@@ -56,9 +56,9 @@ public class Clause
         StringBuffer sql = new StringBuffer(1024);
         for (int i = 0, l = conditions.size(); i < l; i++)
         {
-            String condition = conditions.get(i).format(false);
-            if (null == condition) continue;
-            sql.append(condition);
+            Block block = conditions.get(i).test();
+            if (null == block) continue;
+            sql.append(block.sql);
             if (i < l - 1) sql.append(" and ");
         }
         return sql.length() == 0 ? null : sql.toString().replaceAll("\\s+and\\s+$", "");
