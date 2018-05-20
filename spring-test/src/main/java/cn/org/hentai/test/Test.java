@@ -25,8 +25,20 @@ public class Test
         user.setCreateTime(new Date());
 
         TestDAO testDAO = new TestDAO();
+
+        // 主键查询
         testDAO.getById(12);
+
+        // in (*)查询
+        testDAO.find(new int[] { 1, 3, 5, 7, 9 });
+
+        // 获取单列的值
+        testDAO.getName(33);
+
+        // insert
         testDAO.save(user);
+
+        // update
         testDAO.update(user);
     }
 }

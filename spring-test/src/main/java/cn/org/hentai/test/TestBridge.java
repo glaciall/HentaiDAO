@@ -2,6 +2,7 @@ package cn.org.hentai.test;
 
 import cn.org.hentai.dao.JDBCBridge;
 
+import java.lang.reflect.Array;
 import java.util.List;
 
 /**
@@ -36,7 +37,15 @@ public class TestBridge implements JDBCBridge
         Log.debug("queryOne: " + sql);
         for (int i = 0; i < values.length; i++)
         {
-            Log.debug("\t\t" + values[i]);
+            Object val = values[i];
+            if (val.getClass().isArray())
+            {
+                for (int k = 0, l = Array.getLength(val); k < l; k++)
+                {
+                    Log.debug("\t\t" + Array.get(val, k));
+                }
+            }
+            else Log.debug("\t\t" + values[i]);
         }
         return null;
     }
@@ -45,6 +54,18 @@ public class TestBridge implements JDBCBridge
     public <E> List<E> query(String sql, Class type, Object... values)
     {
         Log.debug("query: " + sql);
+        for (int i = 0; i < values.length; i++)
+        {
+            Object val = values[i];
+            if (val.getClass().isArray())
+            {
+                for (int k = 0, l = Array.getLength(val); k < l; k++)
+                {
+                    Log.debug("\t\t" + Array.get(val, k));
+                }
+            }
+            else Log.debug("\t\t" + values[i]);
+        }
         return null;
     }
 
@@ -52,6 +73,18 @@ public class TestBridge implements JDBCBridge
     public <E> E queryForValue(String sql, Class type, Object... values)
     {
         Log.debug("queryForValue: " + sql);
+        for (int i = 0; i < values.length; i++)
+        {
+            Object val = values[i];
+            if (val.getClass().isArray())
+            {
+                for (int k = 0, l = Array.getLength(val); k < l; k++)
+                {
+                    Log.debug("\t\t" + Array.get(val, k));
+                }
+            }
+            else Log.debug("\t\t" + values[i]);
+        }
         return null;
     }
 

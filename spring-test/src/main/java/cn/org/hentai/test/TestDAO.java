@@ -15,12 +15,24 @@ public class TestDAO extends HentaiDAO
     {
         return select()
                 .from(User.class)
-                .where(
-                        clause("id = ?", gtz(id))
-                        .and("balance > ?", 3.14)
-                        .and("create_time < ?", today())
-                )
+                .byId(id)
                 .query();
+    }
+
+    public String getName(int id)
+    {
+        return select("name")
+                .from(User.class)
+                .byId(id)
+                .queryForValue(String.class);
+    }
+
+    public List<User> find(int[] idList)
+    {
+        return select()
+                .from(User.class)
+                .where(clause("id in (*)", idList))
+                .queryForList();
     }
 
     public Long save(User user)
