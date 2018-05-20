@@ -31,9 +31,13 @@ public class TestBridge implements JDBCBridge
     }
 
     @Override
-    public <E> E queryOne(String sql, Class type)
+    public <E> E queryOne(String sql, Class type, Object... values)
     {
         Log.debug("queryOne: " + sql);
+        for (int i = 0; i < values.length; i++)
+        {
+            Log.debug("\t\t" + values[i]);
+        }
         return null;
     }
 

@@ -25,7 +25,7 @@ public class Test
         user.setCreateTime(new Date());
 
         TestDAO testDAO = new TestDAO();
-        testDAO.getById(0);
+        testDAO.getById(12);
         testDAO.save(user);
         testDAO.update(user);
     }

@@ -3,6 +3,7 @@ package cn.org.hentai.test;
 import cn.org.hentai.dao.HentaiDAO;
 import cn.org.hentai.test.model.User;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -14,7 +15,11 @@ public class TestDAO extends HentaiDAO
     {
         return select()
                 .from(User.class)
-                .where(clause("id = ?", gtz(id)))
+                .where(
+                        clause("id = ?", gtz(id))
+                        .and("balance > ?", 3.14)
+                        .and("create_time < ?", today())
+                )
                 .query();
     }
 

@@ -75,7 +75,7 @@ public class SpringJDBCTemplateBridge implements JDBCBridge
     };
 
     @Override
-    public <E> E queryOne(String sql, Class type)
+    public <E> E queryOne(String sql, Class type, Object...values)
     {
         List<E> list = query(sql, type);
         if (list.size() > 0) return list.get(0);
