@@ -69,14 +69,14 @@ public class Clause
 
     public String toWhereClause(boolean merged)
     {
-        String where = "";
+        StringBuffer where = new StringBuffer(512);
         for (int i = 0, l = conditions.size(); i < l; i++)
         {
             String condition = conditions.get(i).format();
             if (null == condition) continue;
-            where += condition;
-            if (i < l - 1) where += " and ";
+            where.append(condition);
+            if (i < l - 1) where.append(" and ");
         }
-        return "".equals(where) ? null : where.replaceAll("\\s+and\\s+$", "");
+        return "".equals(where) ? null : where.toString().replaceAll("\\s+and\\s+$", "");
     }
 }
