@@ -12,7 +12,7 @@ public final class Log
 
     private static OutputStream logWriter = System.err;
 
-    private static String getCurrentTime()
+    private static synchronized String getCurrentTime()
     {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return sdf.format(new java.util.Date());
