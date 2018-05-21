@@ -40,6 +40,7 @@ public abstract class HentaiDAO
         return new QuerySQL(jdbcBridge).setFields(fields);
     }
 
+    // where从句
     public final Clause clause(String sql, Object value)
     {
         return new Clause().and(sql, value);
@@ -66,19 +67,20 @@ public abstract class HentaiDAO
         return new Concatenation(Concatenation.Concate.like, data);
     }
 
-    public final <E> List<E> query(String sql, Class type)
+    // 直接执行SQL语句
+    public final <E> List<E> query(String sql, Class type, Object...values)
     {
-        return jdbcBridge.query(sql, type);
+        return jdbcBridge.query(sql, type, values);
     }
 
-    public final <E> E queryForValue(String sql, Class type)
+    public final <E> E queryForValue(String sql, Class type, Object...values)
     {
-        return jdbcBridge.queryForValue(sql, type);
+        return jdbcBridge.queryForValue(sql, type, values);
     }
 
-    public final <E> E queryOne(String sql, Class type)
+    public final <E> E queryOne(String sql, Class type, Object...values)
     {
-        return jdbcBridge.queryOne(sql, type);
+        return jdbcBridge.queryOne(sql, type, values);
     }
 
     public final long execute(String sql, Object...values)
