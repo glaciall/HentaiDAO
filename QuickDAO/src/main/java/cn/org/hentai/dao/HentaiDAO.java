@@ -18,6 +18,11 @@ public abstract class HentaiDAO
         return new UpdateSQL(jdbcBridge);
     }
 
+    public final UpdateSQL update(String tableName)
+    {
+        return new UpdateSQL(jdbcBridge).setTableName(tableName);
+    }
+
     // 插入相关
     public final InsertSQL insertInto()
     {
