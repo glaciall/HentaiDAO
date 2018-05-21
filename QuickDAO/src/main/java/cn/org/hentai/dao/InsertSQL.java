@@ -65,7 +65,7 @@ public class InsertSQL extends DBSQL
         return this;
     }
 
-    public String toSQL(boolean merged)
+    public String toSQL()
     {
         StringBuffer sql = new StringBuffer(1024);
         sql.append("insert into " + tableName + " (");
@@ -78,16 +78,15 @@ public class InsertSQL extends DBSQL
             if (i < l - 1) sql.append(',');
             fieldCount += 1;
         }
-        if (!merged) this.values = new Object[fieldCount];
+        this.values = new Object[fieldCount];
         sql.append(") values (");
         for (int i = 0, s = 0, l = fields.size(); i < l; i++)
         {
             Field field = fields.get(i);
             if (field.name.equals(this.primaryKey)) continue;
-            if (merged) sql.append(DbUtil.valueLiteral(field.value));
             else sql.append('?');
             if (i < l - 1) sql.append(',');
-            if (!merged) this.values[s++] = field.value;
+            this.values[s++] = field.value;
         }
         sql.append(")");
         return sql.toString();
@@ -95,12 +94,12 @@ public class InsertSQL extends DBSQL
 
     public long execute()
     {
-        return this.getJdbcBridge().update(toSQL(false), this.values);
+        return this.getJdbcBridge().update(toSQL(), this.values);
     }
 
     public <E> E save()
     {
-        return getJdbcBridge().insert(toSQL(false), this.values);
+        return getJdbcBridge().insert(toSQL(), this.values);
     }
 
     public String toString()
