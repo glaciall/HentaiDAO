@@ -68,7 +68,7 @@ public class InsertSQL extends DBSQL
     public String toSQL()
     {
         StringBuffer sql = new StringBuffer(1024);
-        sql.append("insert into " + tableName + " (");
+        sql.append("insert into ").append(tableName).append(" (");
         int fieldCount = 0;
         for (int i = 0, l = fields.size(); i < l; i++)
         {
