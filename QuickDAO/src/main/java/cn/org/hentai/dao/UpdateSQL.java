@@ -124,7 +124,7 @@ public class UpdateSQL extends DBSQL
         }
     }
 
-    public String toSQL(boolean merged)
+    public String toSQL()
     {
         StringBuffer sql = new StringBuffer(1024);
         // update xxx set a = 1, b = 2, c = 3 where id = ?
@@ -132,7 +132,7 @@ public class UpdateSQL extends DBSQL
         sql.append(this.tableName);
         sql.append(" set ");
         int fieldCount = 0;
-        if (!merged) this.values = new ArrayList();
+        this.values = new ArrayList();
         for (int i = 0, l = fields.size(); i < l; i++)
         {
             Field field = fields.get(i);
@@ -142,24 +142,17 @@ public class UpdateSQL extends DBSQL
             sql.append(field.name);
             sql.append(" = ");
             fieldCount += 1;
-            if (merged) sql.append(DbUtil.valueLiteral(field.value));
-            else
-            {
-                sql.append('?');
-                this.values.add(field.value);
-            }
+            sql.append('?');
+            this.values.add(field.value);
             if (i < l - 1) sql.append(',');
         }
         if (null == clause) throw new RuntimeException("missing where clause");
-        String where = merged ? clause.toWhereClause() : clause.toWhere();
+        String where = clause.toWhere();
         if (where != null)
         {
             sql.append(" where ");
             sql.append(where);
-            if (!merged)
-            {
-                this.values.addAll(Arrays.asList(clause.getValues()));
-            }
+            this.values.addAll(Arrays.asList(clause.getValues()));
         }
         else throw new RuntimeException("missing where clause: " + sql);
         return sql.toString().replaceAll(",\\s+where", " where");
@@ -167,7 +160,7 @@ public class UpdateSQL extends DBSQL
 
     public long execute()
     {
-        return getJdbcBridge().update(toSQL(false), this.values);
+        return getJdbcBridge().update(toSQL(), this.values.toArray());
     }
 
     public String toString()
