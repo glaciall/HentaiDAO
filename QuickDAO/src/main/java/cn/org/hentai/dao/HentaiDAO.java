@@ -1,8 +1,7 @@
 package cn.org.hentai.dao;
 
-import cn.org.hentai.dao.converter.BaseFieldNameConverter;
-import cn.org.hentai.dao.converter.CamelCaseConverterBase;
-import cn.org.hentai.dao.util.DbUtil;
+import cn.org.hentai.dao.converter.IFieldNameConverter;
+import cn.org.hentai.dao.converter.CamelCaseConverter;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -121,12 +120,12 @@ public abstract class HentaiDAO
     }
 
     // 默认的字段名转换器
-    private static BaseFieldNameConverter customFieldNameConverter = new CamelCaseConverterBase();
-    public static void setupFieldNameConverter(BaseFieldNameConverter converter)
+    private static IFieldNameConverter customFieldNameConverter = new CamelCaseConverter();
+    public static void setupFieldNameConverter(IFieldNameConverter converter)
     {
         customFieldNameConverter = converter;
     }
-    public static BaseFieldNameConverter getFieldNameConverter()
+    public static IFieldNameConverter getFieldNameConverter()
     {
         return customFieldNameConverter;
     }
