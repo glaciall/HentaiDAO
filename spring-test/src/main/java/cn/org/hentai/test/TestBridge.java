@@ -14,6 +14,7 @@ public class TestBridge implements JDBCBridge
     public Long insert(String sql, Object... values)
     {
         Log.debug("insert: " + sql);
+        printArguments(values);
         return 0L;
     }
 
@@ -21,6 +22,7 @@ public class TestBridge implements JDBCBridge
     public Long execute(String sql, Object... values)
     {
         Log.debug("execute: " + sql);
+        printArguments(values);
         return 0L;
     }
 
@@ -28,6 +30,7 @@ public class TestBridge implements JDBCBridge
     public Long update(String sql, Object... values)
     {
         Log.debug("update: " + sql);
+        printArguments(values);
         return 0L;
     }
 
@@ -35,18 +38,7 @@ public class TestBridge implements JDBCBridge
     public <E> E queryOne(String sql, Class type, Object... values)
     {
         Log.debug("queryOne: " + sql);
-        for (int i = 0; i < values.length; i++)
-        {
-            Object val = values[i];
-            if (val.getClass().isArray())
-            {
-                for (int k = 0, l = Array.getLength(val); k < l; k++)
-                {
-                    Log.debug("\t\t" + Array.get(val, k));
-                }
-            }
-            else Log.debug("\t\t" + values[i]);
-        }
+        printArguments(values);
         return null;
     }
 
@@ -54,18 +46,7 @@ public class TestBridge implements JDBCBridge
     public <E> List<E> query(String sql, Class type, Object... values)
     {
         Log.debug("query: " + sql);
-        for (int i = 0; i < values.length; i++)
-        {
-            Object val = values[i];
-            if (val.getClass().isArray())
-            {
-                for (int k = 0, l = Array.getLength(val); k < l; k++)
-                {
-                    Log.debug("\t\t" + Array.get(val, k));
-                }
-            }
-            else Log.debug("\t\t" + values[i]);
-        }
+        printArguments(values);
         return null;
     }
 
@@ -73,6 +54,12 @@ public class TestBridge implements JDBCBridge
     public <E> E queryForValue(String sql, Class type, Object... values)
     {
         Log.debug("queryForValue: " + sql);
+        printArguments(values);
+        return null;
+    }
+
+    private void printArguments(Object...values)
+    {
         for (int i = 0; i < values.length; i++)
         {
             Object val = values[i];
@@ -85,7 +72,5 @@ public class TestBridge implements JDBCBridge
             }
             else Log.debug("\t\t" + values[i]);
         }
-        return null;
     }
-
 }
