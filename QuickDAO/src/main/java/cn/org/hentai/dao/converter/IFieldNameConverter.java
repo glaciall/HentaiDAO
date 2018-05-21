@@ -3,7 +3,7 @@ package cn.org.hentai.dao.converter;
 /**
  * Created by matrixy on 2018/4/5.
  */
-public interface BaseFieldNameConverter
+public interface IFieldNameConverter
 {
     /**
      * 从数据库字段名映射到类成员名称
